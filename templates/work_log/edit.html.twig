@@ -1,0 +1,12 @@
+{% embed '_embed/edit.html.twig' with {
+    deleteForm: include('work_log/_delete_form.html.twig'),
+    formId: 'editForm',
+    breadcrumbList: {
+        'Home': path('app_dashboard'),
+        'Work Logs': path('app_work_log_index'),
+    }
+} %}
+    {% block content %}
+        {{ include('work_log/_form.html.twig') }}
+    {% endblock %}
+{% endembed %}

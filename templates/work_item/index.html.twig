@@ -1,0 +1,9 @@
+{% embed '_embed/index.html.twig' with {
+    singluarTitle: 'Work Item',
+    newPath: path('app_work_item_new'),
+} %}
+    {% block content %}
+        {{ component('DataTable:WorkItem', {projectId: project.id|default}) }}
+    {% endblock %}
+{% endembed %}
+

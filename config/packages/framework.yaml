@@ -5,8 +5,23 @@ framework:
     # Note that the session will be started ONLY if you read or write from it.
     session: true
 
+    default_locale: 'en_AU'
+
     #esi: true
     #fragments: true
+
+    http_client:
+        scoped_clients:
+            jira.client:
+                base_uri: '%env(JIRA_CLIENT_BASE_URI)%'
+                auth_basic: '%env(JIRA_CLIENT_AUTH_USERNAME)%:%env(JIRA_CLIENT_AUTH_API_TOKEN)%'
+                headers:
+                    'Accept': 'application/json'
+            tempo.client:
+                base_uri: '%env(TEMPO_CLIENT_BASE_URI)%'
+                auth_bearer: '%env(TEMPO_CLIENT_AUTH_API_TOKEN)%'
+                headers:
+                    'Accept': 'application/json'
 
 when@test:
     framework:

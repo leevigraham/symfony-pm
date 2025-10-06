@@ -1,0 +1,141 @@
+{%- block form_start -%}
+    {%- do form.setMethodRendered() -%}
+    {% set method = method|upper %}
+    {%- if method in ["GET", "POST"] -%}
+        {% set form_method = method %}
+    {%- else -%}
+        {% set form_method = "POST" %}
+    {%- endif -%}
+<form
+    method="{{ form_method|lower }}"
+    {% if name != '' %} name="{{ name }}"{% endif %}
+    {% if action != '' %} action="{{ action }}"{% endif %}
+    {% if multipart %} enctype="multipart/form-data"{% endif %}
+    {{ block('widget_container_attributes') }}
+>
+    {%- if form_method != method -%}
+        <input type="hidden" name="_method" value="{{ method }}" />
+    {%- endif -%}
+{%- endblock form_start -%}
+
+{%- block form_widget_compound -%}
+    {%- if form is rootform -%}
+        <div class="form-body">
+            {{ form_errors(form) }}
+            {{- block('form_rows') -}}
+            {{- form_rest(form) -}}
+        </div>
+    {% else %}
+{#        <div {{ block('widget_container_attributes') }} x>#}
+            {{- block('form_rows') -}}
+            {{- form_rest(form) -}}
+{#        </div>#}
+    {%- endif -%}
+{%- endblock form_widget_compound -%}
+
+{%- block choice_widget_expanded -%}
+    {%- for child in form %}
+    {{- form_row(child) -}}
+    {% endfor -%}
+{%- endblock choice_widget_expanded -%}
+
+{% block checkbox_row %}
+    {{ form_row(form) }}
+{% endblock %}
+
+{%- block form_row -%}
+{#    {%- if expanded|default -%}#}
+{#        {{ block('fieldset_form_row') }}#}
+{#    {%- else -%}#}
+        {%- set widget_attr = {} -%}
+        {%- if help is not empty -%}
+            {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+        {%- endif -%}
+        {% set labelTag = compound ? 'span' : 'label' %}
+        <div {% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+            {{- form_label(form, null, {element: labelTag}) -}}
+            {{- form_help(form) -}}
+            {{- form_errors(form) -}}
+            <div class="form-widget-container">
+            {{- form_widget(form, widget_attr) -}}
+            </div>
+        </div>
+{#    {% endif %}#}
+{%- endblock form_row -%}
+
+{%- block fieldset_form_row -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
+    <fieldset {% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+        {{- form_label(form, null, {element: 'legend'}) -}}
+        {{- form_help(form) -}}
+        {{- form_errors(form) -}}
+        {{- form_widget(form, widget_attr) -}}
+    </fieldset>
+{%- endblock fieldset_form_row -%}
+
+{#{%- block choice_row -%}#}
+{#    {% if not expanded %}#}
+{#        {{ form_row(form) }}#}
+{#    {% else %}#}
+{#        {%- set widget_attr = {} -%}#}
+{#        {%- if help is not empty -%}#}
+{#            {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}#}
+{#        {%- endif -%}#}
+{#        <fieldset  {% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>#}
+{#            {{- form_label(form, null, {element: 'legend'}) -}}#}
+{#            {{- form_help(form) -}}#}
+{#            {{- form_errors(form) -}}#}
+{#            {{- form_widget(form, widget_attr) -}}#}
+{#        </fieldset>#}
+{#    {% endif %}#}
+{#{%- endblock choice_row -%}#}
+
+{%- block datetime_widget -%}
+    {% if widget == 'single_text' %}
+        {{- block('form_widget_simple') -}}
+    {%- else -%}
+        {{ form_row(form.date) }}
+        {{ form_row(form.time) }}
+{#        <div {% with form.date.vars %}{{ block('widget_container_attributes') }}{% endwith %}>#}
+{#            {{- form_label(form.date, null, {element: 'span'}) -}}#}
+{#            {{- form_widget(form.date) -}}#}
+{#            {{- form_errors(form.date) -}}#}
+{#            {{- form_help(form.date) -}}#}
+{#        </div>#}
+{#        <div {% with form.time.vars %}{{ block('widget_container_attributes') }}{% endwith %}>#}
+{#            {{- form_label(form.time, null, {element: 'span'}) -}}#}
+{#            {{- form_widget(form.time) -}}#}
+{#            {{- form_errors(form.time) -}}#}
+{#            {{- form_help(form.time) -}}#}
+{#        </div>#}
+    {%- endif -%}
+{%- endblock datetime_widget -%}
+
+{%- block date_widget -%}
+    {%- if widget == 'single_text' -%}
+        {{ block('form_widget_simple') }}
+    {%- else -%}
+        {{- date_pattern|replace({
+            '{{ year }}':  form_row(form.year),
+            '{{ month }}': form_row(form.month),
+            '{{ day }}':   form_row(form.day),
+        })|raw -}}
+    {%- endif -%}
+{%- endblock date_widget -%}
+
+{%- block time_widget -%}
+    {%- if widget == 'single_text' -%}
+        {{ block('form_widget_simple') }}
+    {%- else -%}
+        {{- form_row(form.hour) -}}
+        {%- if with_minutes -%}{{ form_row(form.minute) }}{%- endif -%}
+        {%- if with_seconds -%}{{ form_row(form.second) }}{%- endif -%}
+    {%- endif -%}
+{%- endblock time_widget -%}
+
+{% block dateinterval_widget %}
+    {{ form_widget(form) }}
+{% endblock %}

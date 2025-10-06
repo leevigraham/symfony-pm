@@ -1,0 +1,40 @@
+{% embed 'components/DataTable/DataTable.html.twig' with {
+    pager: this.getPager(),
+    form: this.formView
+} %}
+    {% block table %}
+        <table>
+            <thead>
+            <tr>
+                {% set columnCount = 3 %}
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col" class="actions" title="Actions"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for entity in pager %}
+                <tr>
+                    <th scope="row">
+                        <a href="{{ path('app_organisation_show', {id: entity.id}) }}">
+                            {{ entity.name }}
+                        </a>
+                    </th>
+                    <td>{{ entity.description }}</td>
+                    <td>
+                        {{ include('_include/element_actions.html.twig', {
+                            popoverId: "popover-#{entity.id}",
+                            viewUrl: path('app_organisation_show', {'id': entity.id}),
+                            editUrl: path('app_organisation_edit', {'id': entity.id}),
+                        }) }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="{{ columnCount }}">No records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endblock %}
+{% endembed %}

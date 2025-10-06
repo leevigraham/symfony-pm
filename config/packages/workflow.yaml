@@ -1,0 +1,24 @@
+framework:
+    workflows:
+        work_log_state:
+            type: state_machine
+            initial_marking: stopped
+            marking_store:
+                type: method
+                property: state
+            supports:
+                - App\Entity\WorkLog
+            places:
+                - stopped
+                - started
+                - submitted
+            transitions:
+                start:
+                    from: stopped
+                    to: started
+                stop:
+                    from: started
+                    to: stopped
+                submit:
+                    from: stopped
+                    to: submitted

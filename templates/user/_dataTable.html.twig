@@ -1,0 +1,40 @@
+{% embed 'components/DataTable/DataTable.html.twig' with {
+    pager: this.getPager(),
+    form: this.formView,
+} %}
+    {% block table %}
+        <table>
+            <thead>
+            <tr>
+                {% set columnCount = 4 %}
+                <th scope="col">Display Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Timezone</th>
+                <th scope="col">Locale</th>
+                <th scope="col" class="actions" title="Actions"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in pager %}
+                <tr>
+                    <th scope="row">{{ include('user/_chip.html.twig', {user}) }}</th>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.timezone }}</td>
+                    <td>{{ user.locale }}</td>
+                    <td>
+                        {{ include('_include/element_actions.html.twig', {
+                            popoverId: "popover-#{user.id}",
+                            viewUrl: path('app_user_show', {id: user.id}),
+                            editUrl: path('app_user_edit', {id: user.id}),
+                        }) }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="{{ columnCount }}">No records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endblock %}
+{% endembed %}

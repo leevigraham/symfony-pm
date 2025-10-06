@@ -1,0 +1,9 @@
+{% embed '_embed/index.html.twig' with {
+    singluarTitle: 'User',
+    newPath: path('app_user_new'),
+} %}
+    {% block content %}
+        {{ component('DataTable:User') }}
+    {% endblock %}
+{% endembed %}
+

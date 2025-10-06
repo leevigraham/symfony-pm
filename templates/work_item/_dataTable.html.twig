@@ -1,0 +1,59 @@
+{% embed 'components/DataTable/DataTable.html.twig' with {
+    pager: this.getPager(),
+    form: this.formView,
+    showProject: not projectId
+} %}
+    {% block table %}
+        <table>
+            <thead>
+            <tr>
+                {% set columnCount = 7 %}
+                <th scope="col">Key</th>
+                <th scope="col">Title</th>
+                {% if showProject %}
+                    <th scope="col">Project</th>
+                {% endif %}
+                <th scope="col">Status</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Original Estimate</th>
+                <th scope="col">Time Spent</th>
+                <th scope="col">Time Remaining</th>
+                <th scope="col" class="date">Created</th>
+                <th scope="col" class="actions" title="Actions"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for work_item in pager %}
+                <tr>
+                    <th scope="row" class="code">
+                        <a href="{{ path('app_work_item_show', {key: work_item.key}) }}">
+                            {{ work_item.key }}
+                        </a>
+                    </th>
+                    <td>{{ include('work_item/_chip.html.twig', {work_item}) }}</td>
+                    {% if showProject %}
+                        <td>{{ work_item.project ? include('project/_chip.html.twig', {project: work_item.project}) }}</td>
+                    {% endif %}
+                    <td>{{ work_item.status.value|default }}</td>
+                    <td>{{ work_item.priority.value|default }}</td>
+                    <td class="code">{{ work_item.originalEstimateInSeconds|seconds_to_human }}</td>
+                    <td class="code">{{ work_item.timeSpentInSeconds|seconds_to_human }}</td>
+                    <td class="code">{{ work_item.remainingEstimateInSeconds|seconds_to_human }}</td>
+                    <td class="date">{{ work_item.createdAt|format_datetime }}</td>
+                    <td>
+                        {{ include('_include/element_actions.html.twig', {
+                            popoverId: "popover-#{work_item.id}",
+                            viewUrl: path('app_work_item_show', {key: work_item.key}),
+                            editUrl: path('app_work_item_edit', {key: work_item.key}),
+                        }) }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="{{ columnCount }}">No records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endblock %}
+{% endembed %}

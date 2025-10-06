@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="page" style="max-width: 640px; margin-inline: auto">
+        {{ include('include/breadcrumb_list.html.twig', {breadcrumbList}) }}
+        <div class="page-header">
+            <h1>{{ pageTitle }}</h1>
+            <button type="submit" class="button button--primary" form="{{ form.vars.id }}">Save</button>
+        </div>
+        {% block content %}
+            {{ form(form) }}
+        {% endblock %}
+    </div>
+{% endblock %}

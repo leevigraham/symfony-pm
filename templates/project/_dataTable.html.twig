@@ -1,0 +1,40 @@
+{#{{ dump(this) }}#}
+{#{{ dump(_context) }}#}
+{% embed 'components/DataTable/DataTable.html.twig' with {
+    pager: this.getPager(),
+    form: this.formView
+} %}
+    {% block table %}
+        <table>
+            <thead>
+            <tr>
+                {% set columnCount = 4 %}
+                <th scope="col">Name</th>
+                <th scope="col">Key</th>
+                <th scope="col">Description</th>
+                <th scope="col" class="actions" title="Actions"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for project in pager %}
+                <tr>
+                    <th scope="row">{{ include('project/_chip.html.twig', {project: project}) }}</th>
+                    <td class="code">{{ project.key }}</td>
+                    <td>{{ project.description|u.truncate(100, '…') }}</td>
+                    <td>
+                        {{ include('_include/element_actions.html.twig', {
+                            popoverId: "popover-#{project.id}",
+                            viewUrl: path('app_project_show', {key: project.key}),
+                            editUrl: path('app_project_edit', {key: project.key}),
+                        }) }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="{{ columnCount }}">No records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endblock %}
+{% endembed %}

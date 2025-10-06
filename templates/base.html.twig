@@ -1,17 +1,84 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{{ pageTitle|default }}{% endblock %}</title>
+    <link rel="icon"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+    {% block stylesheets %}
+    {% endblock %}
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
+    {% block javascripts %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% endblock %}
+</head>
+<body>
+<header id="header">
+{#    <a href="{{ path('app_dashboard') }}" class="app-logo">#}
+{#        <svg width="1280" height="800" viewBox="0 0 1280 800" fill="none" xmlns="http://www.w3.org/2000/svg">#}
+{#            <path d="M0 800H346.667L440 453.333H93.3333L0 800Z"/>#}
+{#            <path d="M720 800H1066.67L1280 0H933.333L720 800Z"/>#}
+{#            <path d="M720 799.999L1066.7 799.999V760L493.333 80L400 426.666L720 799.999Z" />#}
+{#        </svg>#}
+{#    </a>#}
+    <div class="account-nav">
+        <button type="button" popovertarget="user-nav" class="button">
+            {{ app.user.displayName }}
+{#            {{ component('UserAvatar', { user: app.user }) }}#}
+        </button>
+        <div id="user-nav" class="popover" popover>
+            <div class="popover-header">
+                <div><strong>{{ app.user }}</strong></div>
+                <div>{{ app.user.email }}</div>
+            </div>
+            <div class="menu">
+                <ul>
+                    <li>
+                        <a href="{{ path('app_settings_user_profile') }}" class="menu-item">
+                            <span class="menu-item-label">Settings</span>
+                        </a>
+                    </li>
+                </ul>
+                <div class="menu-divider"></div>
+                <ul>
+                    <li>
+                        {% if is_granted('IS_IMPERSONATOR') %}
+                            <a href="{{ impersonation_exit_path(path('app_dashboard') ) }}" class="menu-item">
+                                <span class="menu-item-label">Exit impersonation</span>
+                            </a>
+                        {% else %}
+                            <a href="{{ path('app_logout') }}" class="menu-item">
+                                <span class="menu-item-label">Sign out</span>
+                            </a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+<div id="sidebar">
+    <nav>
+        <div class="menu">
+            <ul>
+                <li><a href="{{ url('app_dashboard') }}">Home</a></li>
+                <li><a href="{{ url('app_organisation_index') }}">Organisations</a></li>
+                <li><a href="{{ url('app_project_index') }}">Projects</a></li>
+                <li><a href="{{ url('app_work_item_index') }}">Work Items</a></li>
+                <li><a href="{{ url('app_work_log_index') }}">Work Logs</a></li>
+                <li><a href="{{ url('app_user_index') }}">Users</a></li>
+                <li><a href="{{ url('app_team_index') }}">Teams</a></li>
+            </ul>
+        </div>
+    </nav>
+</div>
+<main id="main">
+    <div class="page-container">
         {% block body %}{% endblock %}
-    </body>
+    </div>
+</main>
+<footer>
+
+</footer>
+</body>
 </html>

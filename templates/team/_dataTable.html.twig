@@ -1,0 +1,36 @@
+{#{{ dump(this) }}#}
+{#{{ dump(_context) }}#}
+{% embed 'components/DataTable/DataTable.html.twig' with {
+    pager: this.getPager(),
+    form: this.formView
+} %}
+    {% block table %}
+        <table>
+            <thead>
+            <tr>
+                {% set columnCount = 4 %}
+                <th scope="col">Name</th>
+                <th scope="col" class="actions" title="Actions"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for team in pager %}
+                <tr>
+                    <th scope="row">{{ include('team/_chip.html.twig', {team: team}) }}</th>
+                    <td>
+                        {{ include('_include/element_actions.html.twig', {
+                            popoverId: "popover-#{team.id}",
+                            viewUrl: path('app_team_show', {id: team.id}),
+                            editUrl: path('app_team_edit', {id: team.id}),
+                        }) }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="{{ columnCount }}">No records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endblock %}
+{% endembed %}

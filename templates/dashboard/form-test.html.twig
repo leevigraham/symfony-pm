@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+
+{% macro project_option(listboxId, project) %}
+    <li class="listbox-option"
+        id="{{ listboxId }}-option-{{ project.id }}"
+        role="option"
+        data-listbox-target="option"
+        data-listbox-option-label="{{ "#{project.name} - #{project.key}" }}"
+        data-listbox-option-value="{{ project.id }}"
+    >
+        <span aria-hidden="true" class="listbox-option-marker">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor"
+                                                                                                     d="m9.55 15.15l8.475-8.475q.3-.3.7-.3t.7.3t.3.713t-.3.712l-9.175 9.2q-.3.3-.7.3t-.7-.3L4.55 13q-.3-.3-.288-.712t.313-.713t.713-.3t.712.3z"/></svg>
+        </span>
+        <div>
+            <span>{{ project.name }}</span>
+            <span>{{ project.key }}</span>
+        </div>
+    </li>
+{% endmacro %}
+
+{% macro listbox(listboxId, projects, combobox, autofocus) %}
+    <div data-controller="listbox" data-select-target="listbox">
+        {% if combobox|default %}
+            <div style="margin-bottom: 4px">
+                <input type="text"
+                       role="combobox"
+                       aria-autocomplete="list"
+                       aria-controls="{{ listboxId }}"
+                       aria-expanded="true"
+                       aria-labelledby="{{ listboxId }}-label"
+                       autocomplete="off"
+                       autocorrect="off"
+                       spellcheck="false"
+                       data-listbox-target="filter"
+                       {{ autofocus|default ? 'autofocus' }}
+                >
+            </div>
+            <div data-listbox-target="noResults" class="listbox-no-results hidden">No Results</div>
+        {% endif %}
+        <div id="{{ listboxId }}"
+             class="listbox"
+             role="listbox"
+             aria-orientation="vertical"
+             aria-labelledby="{{ listboxId }}-label"
+             data-listbox-target="listbox"
+        >
+            <div class="listbox-group">
+                <div class="listbox-group-heading"
+                     id="{{ listboxId }}-heading-1"
+                     aria-hidden="true"
+                >Recent Projects</div>
+                <ul class="listbox-options"
+                    role="group"
+                    aria-labelledby="{{ listboxId }}-heading-1"
+                >
+                    {% for project in projects[0:4] %}
+                        {{ _self.project_option(listboxId, project) }}
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="listbox-group">
+                <div class="listbox-group-heading"
+                     id="{{ listboxId }}-heading-2"
+                     aria-hidden="true"
+                >Other Projects</div>
+                <ul class="listbox-options"
+                    role="group"
+                    aria-labelledby="{{ listboxId }}-heading-2"
+                >
+                    {% for project in projects[4:] %}
+                        {{ _self.project_option(listboxId, project) }}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% block body %}
+    <div class="page" style="max-width: 640px; margin-inline: auto; display: grid; gap: 20px;">
+
+        <div class="form">
+            <div class="form-body">
+
+                {% set listboxId = 'listbox1' %}
+                <div class="form-row form-type">
+                    <label for="{{ listboxId }}" id="{{ listboxId }}-label" class="form-label">Listbox example</label>
+                    <div class="form-widget-container">
+                        <div class="popover" style="padding: 4px;">
+                            {{ _self.listbox(listboxId, projects) }}
+                        </div>
+                    </div>
+                </div>
+
+                {% set listboxId = 'listbox2' %}
+                <div class="form-row form-type">
+                    <label for="{{ listboxId }}" id="{{ listboxId }}-label" class="form-label">Listbox (combobox) example</label>
+                    <div class="form-widget-container">
+                        <div class="popover" style="padding: 4px;">
+                            {{ _self.listbox(listboxId, projects, true) }}
+                        </div>
+                    </div>
+
+                </div>
+
+                {% set listboxId = 'listbox3' %}
+                <div class="form-row form-type">
+                    <label for="{{ listboxId }}" id="{{ listboxId }}-label" class="form-label">Select example</label>
+                    <div class="form-widget-container">
+                        <div data-controller="select">
+                            <button class="button select"
+                                    type="button"
+                                    popovertarget="popover-{{ listboxId }}"
+                                    data-select-target="button"
+                                    style="width: auto;"
+                            >
+                                Select a project
+                            </button>
+                            <input type="hidden" data-select-target="input">
+                            <div popover
+                                 id="popover-{{ listboxId }}"
+                                 class="popover"
+                                 data-select-target="popover"
+                                 style="padding: 4px;"
+                            >
+                                {{ _self.listbox(listboxId, projects, true, true) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        {{ form(form) }}
+    </div>
+{% endblock %}

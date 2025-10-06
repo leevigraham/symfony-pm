@@ -1,0 +1,29 @@
+<div {{ attributes }}>
+    <div class="data-table" data-controller="data-table">
+        <div class="data-table-header">
+            {{ form_start(form, {
+                method: 'get',
+                attr: {
+                    'class': 'data-table-filter',
+                    'data-model': '*',
+                    'data-action': 'input->live#action:prevent live#action:prevent',
+                    'data-live-action-param': 'doSearch'
+                }
+            }) }}
+            {{ form_rest(form) }}
+            <button type="submit" class="button">Search</button>
+            {{ form_end(form) }}
+        </div>
+        <div class="data-table-body">
+            {% block table %}{% endblock %}
+        </div>
+        {% if pager.nbResults %}
+        <div class="data-table-footer">
+            {{ pagerfanta(pager, options={
+                routeName: _paginationBaseRoute,
+                routeParams: _paginationBaseRouteParams
+            }) }}
+        </div>
+        {% endif %}
+    </div>
+</div>

@@ -1,0 +1,8 @@
+{% embed '_embed/edit.html.twig' with {
+    deleteForm: include('organisation/_delete_form.html.twig'),
+    breadcrumbList: {
+        'Home': path('app_dashboard'),
+        'Organisations': path('app_organisation_index'),
+    }
+} %}
+{% endembed %}

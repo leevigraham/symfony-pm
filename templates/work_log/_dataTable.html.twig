@@ -1,0 +1,49 @@
+{% embed 'components/DataTable/DataTable.html.twig' with {
+    pager: this.getPager(),
+    form: this.formView,
+    showWorkItem: not workItemId
+} %}
+    {% block table %}
+        <table>
+            <thead>
+            <tr>
+                {% set columnCount = 6 %}
+                <th scope="col">Description</th>
+                {% if showWorkItem %}
+                    <th scope="col">Work Item</th>
+                {% endif %}
+                {#                    <th scope="col">State</th>#}
+                <th scope="col">Started At</th>
+                <th scope="col">Duration</th>
+                <th scope="col">Billable Duration</th>
+                <th scope="col" class="actions" title="Actions"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for work_log in pager %}
+                <tr>
+                    <th scope="row"><a href="{{ path('app_work_log_show', {id: work_log.id}) }}">{{ work_log.description }}</a></th>
+                    {% if showWorkItem %}
+                        <td>{{ work_log.workItem ? include('work_item/_chip.html.twig', {work_item: work_log.workItem }) }}</td>
+                    {% endif %}
+                    {#                        <td>{{ work_log.state.value }}</td>#}
+                    <td class="nowrap">{{ work_log.startedAt ? work_log.startedAt|date('Y-m-d H:i:s') : '' }}</td>
+                    <td>{{ work_log.durationInSeconds|seconds_to_human }}</td>
+                    <td>{{ work_log.billableDurationInSeconds|seconds_to_human }}</td>
+                    <td>
+                        {{ include('_include/element_actions.html.twig', {
+                            popoverId: "popover-#{work_log.id}",
+                            viewUrl: path('app_work_log_show', {id: work_log.id}),
+                            editUrl: path('app_work_log_edit', {id: work_log.id}),
+                        }) }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="{{ columnCount }}">No records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endblock %}
+{% endembed %}
