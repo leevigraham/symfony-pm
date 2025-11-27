@@ -24,11 +24,11 @@ class KernelSubscriber implements EventSubscriberInterface
 
         /** @var User $user */
         $user = $this->security->getUser();
-        $event->getRequest()->setLocale($user?->getLocale() ?: 'en_AU');
+        $event->getRequest()->setLocale($user?->locale ?: 'en_AU');
 
         $this->twig
             ->getExtension(\Twig\Extension\CoreExtension::class)
-            ->setTimezone($user?->getTimezone() ?: 'Australia/Sydney')
+            ->setTimezone($user?->timezone ?: 'Australia/Sydney')
         ;
     }
 

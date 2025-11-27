@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="page {{ page.classList|join(' ') }}">
+        {{ page.breadcrumbList ? include('include/breadcrumb_list.html.twig', {breadcrumbList: page.breadcrumbList}) }}
+        <div class="page-header">
+            <h1>{{ page.title }}</h1>
+            {% if page.actions %}
+                <div class="page-header-actions">
+                    {% for component in page.actions %}
+                        {{ component(...component) }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        {% if page.menu %}
+            <nav title="Section Navigation">
+                <ul class="Tabs">
+                    {% for menuItem in page.menu %}
+                        <li>
+                            <a href="{{ menuItem.url }}" class="{% if menuItem.active %}active{% endif %}">
+                                {{ menuItem.label }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </nav>
+        {% endif %}
+        <div class="page-body">
+            {% include page.template with page.templateVars %}
+        </div>
+    </div>
+{% endblock %}

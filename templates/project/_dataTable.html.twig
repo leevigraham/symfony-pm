@@ -1,27 +1,34 @@
-{#{{ dump(this) }}#}
-{#{{ dump(_context) }}#}
+{# {{ dump(this) }} #}
+{# {{ dump(_context) }} #}
 {% embed 'components/DataTable/DataTable.html.twig' with {
     pager: this.getPager(),
-    form: this.formView
+    _form: this.formView,
+    title: "test"
 } %}
     {% block table %}
         <table>
             <thead>
             <tr>
-                {% set columnCount = 4 %}
+                {% set columnCount = 5 %}
+                <th scope="col" hidden>Link</th>
                 <th scope="col">Name</th>
+                <th scope="col">ID</th>
                 <th scope="col">Key</th>
-                <th scope="col">Description</th>
-                <th scope="col" class="actions" title="Actions"></th>
+{#                <th scope="col">Description</th>#}
+                <th scope="col" title="Actions"></th>
             </tr>
             </thead>
-            <tbody>
+            <tbody {{ stimulus_action('data-table', 'handleRowClick', 'click') }}>
             {% for project in pager %}
                 <tr>
-                    <th scope="row">{{ include('project/_chip.html.twig', {project: project}) }}</th>
+                    <td hidden>
+                        <a href="{{ path('app_project_show', {key: project.key}) }}" data-action="view">{{ project.name }}</a>
+                    </td>
+                    <th scope="row" class="chip">{{ include('project/_chip.html.twig', {project}) }}</th>
+                    <td class="id">{{ project.id }}</td>
                     <td class="code">{{ project.key }}</td>
-                    <td>{{ project.description|u.truncate(100, '…') }}</td>
-                    <td>
+{#                    <td class="text">{{ project.description|u.truncate(100, '…') }}</td>#}
+                    <td class="actions">
                         {{ include('_include/element_actions.html.twig', {
                             popoverId: "popover-#{project.id}",
                             viewUrl: path('app_project_show', {key: project.key}),

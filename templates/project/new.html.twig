@@ -1,8 +1,11 @@
-{% embed '_embed/new.html.twig' with {
-    breadcrumbList: {
-        'Home': path('app_dashboard'),
-        'Projects': path('app_project_index'),
-    }
-} %}
-{% endembed %}
+<p>
+    <a href="{{ path('app_project_new', {key: project.key}) }}"
+       data-action="drawer-manager#openUrlInDrawer"
+    >
+        New
+    </a>
+</p>
 
+<div class="Panel">
+    {{ form(form) }}
+</div>

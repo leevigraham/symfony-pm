@@ -1,0 +1,61 @@
+<div class="Panel">
+    <div class="Panel-body">
+        <dl class="details">
+            <div>
+                <dt>ID</dt>
+                <dd>{{ work_item.id }}</dd>
+            </div>
+            <div>
+                <dt>Project</dt>
+                <dd>{{ include('project/_chip.html.twig', {project: work_item.project}) }}</dd>
+            </div>
+            <div>
+                <dt>Key</dt>
+                <dd>{{ work_item.key }}</dd>
+            </div>
+            <div>
+                <dt>Title</dt>
+                <dd>{{ work_item.title }}</dd>
+            </div>
+            <div>
+                <dt>Priority</dt>
+                <dd>{{ work_item.priority.value|default }}</dd>
+            </div>
+            <div>
+                <dt>Status</dt>
+                <dd>{{ work_item.status.value|default }}</dd>
+            </div>
+            <div>
+                <dt>Description</dt>
+                <dd>{{ work_item.description }}</dd>
+            </div>
+            <div>
+                <dt>Original Estimate</dt>
+                <dd>{{ work_item.originalEstimateInSeconds|seconds_to_human }}</dd>
+            </div>
+            <div>
+                <dt>Remaining Estimate</dt>
+                <dd>{{ work_item.remainingEstimateInSeconds|seconds_to_human }}</dd>
+            </div>
+            <div>
+                <dt>Time Spent</dt>
+                <dd>{{ work_item.timeSpentInSeconds|seconds_to_human }}</dd>
+            </div>
+            <div>
+                <dt>Import Key</dt>
+                <dd>{{ work_item.importKey }}</dd>
+            </div>
+            <div>
+                <dt>Parent</dt>
+                <dd>
+                    {{ work_item.parentWorkItem ? include('work_item/_chip.html.twig', {work_item: work_item.parentWorkItem}) }}
+                </dd>
+            </div>
+        </dl>
+    </div>
+</div>
+
+{# {{ component('DataTable:WorkItem', { #}
+{#    parentId: work_item.id, #}
+{#    title: "Sub Work Items" #}
+{# }) }} #}

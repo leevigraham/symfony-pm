@@ -1,50 +1,40 @@
-{% set formId = 'editForm' %}
-{% embed '_embed/show.html.twig' with {
-    editUrl: path('app_work_log_edit', {id: work_log.id}),
-    deleteForm: include('work_log/_delete_form.html.twig'),
-    breadcrumbList: {
-        'Home': path('app_dashboard'),
-        'Work Logs': path('app_work_log_index'),
-    }
-} %}
-    {% block content %}
-        <div class="panel">
-            <table>
-                <tbody>
-                <tr>
-                    <th scope="row">ID</th>
-                    <td>{{ work_log.id }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Work Item</th>
-                    <td>{{ include('work_item/_chip.html.twig', {work_item: work_log.workItem }) }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Project</th>
-                    <td>{{ include('project/_chip.html.twig', {project: work_log.workItem.project }) }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Description</th>
-                    <td>{{ work_log.description }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">State</th>
-                    <td>{{ work_log.state.value|default }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Started At</th>
-                    <td>{{ work_log.startedAt ? work_log.startedAt|date('Y-m-d H:i:s') : '' }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Duration In Seconds</th>
-                    <td>{{ work_log.durationInSeconds }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Billable Duration In Seconds</th>
-                    <td>{{ work_log.billableDurationInSeconds }}</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    {% endblock %}
-{% endembed %}
+<div class="Panel">
+    <div class="Panel-body">
+        <table class="details">
+            <tbody>
+            <tr>
+                <th scope="row">ID</th>
+                <td>{{ work_log.id }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Work Item</th>
+                <td>{{ include('work_item/_chip.html.twig', {work_item: work_log.workItem }) }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Project</th>
+                <td>{{ include('project/_chip.html.twig', {project: work_log.workItem.project }) }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Description</th>
+                <td>{{ work_log.description }}</td>
+            </tr>
+            <tr>
+                <th scope="row">State</th>
+                <td>{{ work_log.state.value|default }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Started At</th>
+                <td>{{ work_log.startedAt ? work_log.startedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Duration In Seconds</th>
+                <td>{{ work_log.durationInSeconds }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Billable Duration In Seconds</th>
+                <td>{{ work_log.billableDurationInSeconds }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+<div class="dialog">
+    <header class="dialog-header">
+        <h1>{{ page.title }}</h1>
+        {% if page.actions %}
+            <div class="dialog-header-actions">
+                {% for component in page.actions %}
+                    {{ component(...component) }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </header>
+    <div class="dialog-body">
+        {% include page.template with page.templateVars %}
+    </div>
+</div>

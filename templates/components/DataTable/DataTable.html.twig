@@ -1,29 +1,46 @@
 <div {{ attributes }}>
-    <div class="data-table" data-controller="data-table">
-        <div class="data-table-header">
+    <div class="Panel"
+         {{ stimulus_controller('data-table') }}
+    >
+        {% set _header %}
+            {% if title ?? false %}
+                <h2 class="Panel-heading">{{ title }}</h2>
+            {% endif %}
+            {% set form = false %}
+            {% if form %}
             {{ form_start(form, {
                 method: 'get',
-                attr: {
+                _attr: {
                     'class': 'data-table-filter',
                     'data-model': '*',
                     'data-action': 'input->live#action:prevent live#action:prevent',
-                    'data-live-action-param': 'doSearch'
+                    'data-live-action-param': 'doSearch',
+                    'data-namespace': namespace|default
                 }
             }) }}
-            {{ form_rest(form) }}
-            <button type="submit" class="button">Search</button>
+            <div class="form-body">
+                {{ form_rest(form) }}
+            </div>
+            <div class="form-footer">
+                <button type="submit" class="button">Search</button>
+            </div>
             {{ form_end(form) }}
+            {% endif %}
+        {% endset %}
+
+        {% if _header|trim %}
+        <div class="Panel-header">
+            {{ _header }}
         </div>
-        <div class="data-table-body">
+        {% endif %}
+
+        <div class="Panel-body">
             {% block table %}{% endblock %}
         </div>
         {% if pager.nbResults %}
-        <div class="data-table-footer">
-            {{ pagerfanta(pager, options={
-                routeName: _paginationBaseRoute,
-                routeParams: _paginationBaseRouteParams
-            }) }}
-        </div>
+            <div class="Panel-footer">
+                {{ pagerfanta(pager, options=this.paginationOptions) }}
+            </div>
         {% endif %}
     </div>
 </div>

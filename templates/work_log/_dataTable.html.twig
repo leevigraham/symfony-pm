@@ -1,13 +1,15 @@
 {% embed 'components/DataTable/DataTable.html.twig' with {
+    title: this.title,
     pager: this.getPager(),
     form: this.formView,
     showWorkItem: not workItemId
 } %}
     {% block table %}
+        {% set columnCount = showWorkItem ? 7 : 6 %}
         <table>
             <thead>
             <tr>
-                {% set columnCount = 6 %}
+                <th scope="col">ID</th>
                 <th scope="col">Description</th>
                 {% if showWorkItem %}
                     <th scope="col">Work Item</th>
@@ -16,13 +18,14 @@
                 <th scope="col">Started At</th>
                 <th scope="col">Duration</th>
                 <th scope="col">Billable Duration</th>
-                <th scope="col" class="actions" title="Actions"></th>
+                <th scope="col" title="Actions"></th>
             </tr>
             </thead>
             <tbody>
             {% for work_log in pager %}
                 <tr>
-                    <th scope="row"><a href="{{ path('app_work_log_show', {id: work_log.id}) }}">{{ work_log.description }}</a></th>
+                    <th scope="row" class="id"><a href="{{ path('app_work_log_show', {id: work_log.id}) }}">{{ work_log.id }}</a></th>
+                    <td>{{ work_log.description }}</td>
                     {% if showWorkItem %}
                         <td>{{ work_log.workItem ? include('work_item/_chip.html.twig', {work_item: work_log.workItem }) }}</td>
                     {% endif %}
@@ -30,7 +33,7 @@
                     <td class="nowrap">{{ work_log.startedAt ? work_log.startedAt|date('Y-m-d H:i:s') : '' }}</td>
                     <td>{{ work_log.durationInSeconds|seconds_to_human }}</td>
                     <td>{{ work_log.billableDurationInSeconds|seconds_to_human }}</td>
-                    <td>
+                    <td class="actions">
                         {{ include('_include/element_actions.html.twig', {
                             popoverId: "popover-#{work_log.id}",
                             viewUrl: path('app_work_log_show', {id: work_log.id}),

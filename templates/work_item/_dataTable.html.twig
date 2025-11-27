@@ -4,15 +4,16 @@
     showProject: not projectId
 } %}
     {% block table %}
+        {% set columnCount = showProject ? 11 : 10 %}
         <table>
             <thead>
             <tr>
-                {% set columnCount = 7 %}
-                <th scope="col">Key</th>
+                <th scope="col">ID</th>
                 <th scope="col">Title</th>
                 {% if showProject %}
                     <th scope="col">Project</th>
                 {% endif %}
+                <th scope="col">Key</th>
                 <th scope="col">Status</th>
                 <th scope="col">Priority</th>
                 <th scope="col">Original Estimate</th>
@@ -25,15 +26,12 @@
             <tbody>
             {% for work_item in pager %}
                 <tr>
-                    <th scope="row" class="code">
-                        <a href="{{ path('app_work_item_show', {key: work_item.key}) }}">
-                            {{ work_item.key }}
-                        </a>
-                    </th>
-                    <td>{{ include('work_item/_chip.html.twig', {work_item}) }}</td>
+                    <td class="id">{{ work_item.id }}</td>
+                    <th scope="row">{{ include('work_item/_chip.html.twig', {work_item}) }}</th>
                     {% if showProject %}
                         <td>{{ work_item.project ? include('project/_chip.html.twig', {project: work_item.project}) }}</td>
                     {% endif %}
+                    <td class="code">{{ work_item.key }}</td>
                     <td>{{ work_item.status.value|default }}</td>
                     <td>{{ work_item.priority.value|default }}</td>
                     <td class="code">{{ work_item.originalEstimateInSeconds|seconds_to_human }}</td>

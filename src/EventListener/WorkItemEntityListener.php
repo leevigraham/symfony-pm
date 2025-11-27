@@ -15,30 +15,30 @@ use Doctrine\ORM\Event\PrePersistEventArgs;
 class WorkItemEntityListener
 {
     public function __construct(
-        private SequenceGeneratorService $sequenceGenerator,
+        private readonly SequenceGeneratorService $sequenceGenerator,
     )
     {
     }
 
     public function generateKey(WorkItem $workItem, PrePersistEventArgs $eventArgs): void
     {
-        if($workItem->getKey()) {
+        if ($workItem->key) {
             // If the key is already set, we do not generate a new one.
             return;
         }
 
-        $project = $workItem->getProject();
+        $project = $workItem->project;
 
         if (null === $project) {
             throw new \LogicException('Cannot generate key for WorkItem without a Project.');
         }
 
-        $projectKey = $project->getKey();
+        $projectKey = $project->key;
         $scope = 'project_' . $projectKey;
 
         $sequence = $this->sequenceGenerator->next($scope);
 
-        $workItem->setSequence($sequence);
-        $workItem->setKey(sprintf('%s-%d', $projectKey, $sequence));
+        $workItem->sequence = $sequence;
+        $workItem->key = sprintf('%s-%d', $projectKey, $sequence);
     }
 }

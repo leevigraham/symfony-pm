@@ -1,9 +1,2 @@
-{% embed '_embed/index.html.twig' with {
-    singluarTitle: 'Time Log',
-    newPath: path('app_work_log_new'),
-} %}
-    {% block content %}
-        {{ component('DataTable:WorkLog') }}
-    {% endblock %}
-{% endembed %}
+{{ component('DataTable:WorkLog') }}
 

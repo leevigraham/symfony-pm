@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\BlameableEntity;
+use App\Entity\Trait\TimestampableEntity;
 use App\Repository\TeamRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Blameable\Traits\BlameableEntity;
-use Gedmo\Timestampable\Traits\TimestampableEntity;
-use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: TeamRepository::class)]
@@ -18,55 +18,42 @@ class Team
     use BlameableEntity;
 
     #[ORM\Id]
-    #[ORM\Column(type: UuidType::NAME, unique: true)]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    private ?Uuid $id = null;
+    #[ORM\Column]
+    #[ORM\GeneratedValue]
+    public ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    public ?string $name = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    public ?string $description = null;
 
     /**
      * @var Collection<int, TeamMember>
      */
-    #[ORM\OneToMany(targetEntity: TeamMember::class, mappedBy: 'team', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    private Collection $members;
+    #[ORM\OneToMany(
+        targetEntity: TeamMember::class,
+        mappedBy: 'team',
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    public Collection $members;
 
     public function __construct()
     {
         $this->members = new ArrayCollection();
     }
 
-    public function getId(): ?Uuid
-    {
-        return $this->id;
-    }
-
-    public function getName(): ?string
+    public function __toString(): string
     {
         return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, TeamMember>
-     */
-    public function getMembers(): Collection
-    {
-        return $this->members;
     }
 
     public function addMember(TeamMember $member): static
     {
         if (!$this->members->contains($member)) {
             $this->members->add($member);
-            $member->setTeam($this);
+            $member->team = $this;
         }
 
         return $this;
@@ -76,8 +63,8 @@ class Team
     {
         if ($this->members->removeElement($member)) {
             // set the owning side to null (unless already changed)
-            if ($member->getTeam() === $this) {
-                $member->setTeam(null);
+            if ($member->team === $this) {
+                $member->team =null;
             }
         }
 

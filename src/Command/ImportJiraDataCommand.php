@@ -58,7 +58,7 @@ class ImportJiraDataCommand extends Command
         $this->io = new SymfonyStyle($input, $output);
         $this->io->title('Importing Jira data');
 
-        //        $this->importOrganisations();
+        $this->importOrganisations();
         $projectKeys = $projectKeys ? preg_split('/[\s,]+/', $projectKeys, -1, PREG_SPLIT_NO_EMPTY) : [];
         $this->importProjects($projectKeys);
         return Command::SUCCESS;
@@ -85,13 +85,14 @@ class ImportJiraDataCommand extends Command
                 $progressIndicator = str_pad((string)$count, strlen($total), ' ', STR_PAD_LEFT) . '/' . $total;
                 $this->io->text("* {$progressIndicator} - Importing project: {$projectData['name']} ({$projectData['key']})");
                 $importKey = $projectData['id'];
+
+                /** @var Project $project */
                 $project = $this->projectRepository->findOneBy(['importKey' => $importKey]) ?? new Project();
-                $project
-                    ->setImportKey($importKey)
-                    ->setKey($projectData['key'])
-                    ->setName($projectData['name'])
-                    ->setDescription($projectData['description'])
-                ;
+                $project->importKey = $importKey;
+                $project->key = $projectData['key'];
+                $project->name = $projectData['name'];
+                $project->description = $projectData['description'] ?? null;
+
                 $this->entityManager->persist($project);
                 $this->entityManager->flush();
                 if ($this->importWorkItems) {
@@ -113,7 +114,7 @@ class ImportJiraDataCommand extends Command
     {
         $responseData = $this->jiraClient->request('POST', '/rest/api/3/search/approximate-count', [
             'json' => [
-                'jql' => 'project = ' . $project->getKey()
+                'jql' => 'project = ' . $project->key
             ]
         ])->toArray();
         $count = $responseData['count'] ?? 0;
@@ -136,50 +137,50 @@ class ImportJiraDataCommand extends Command
             ],
             'expand' => 'children',
             'fieldsByKeys' => true,
-            'jql' => 'project = ' . $project->getKey(),
+            'jql' => 'project = ' . $project->key,
             'maxResults' => 5000
         ];
         do {
             try {
                 $responseData = $this->jiraClient->request('POST', $url, ['json' => $json])->toArray();
             } catch (\Exception $e) {
-                $this->io->error("Failed to fetch work items for project {$project->getKey()}: " . $e->getMessage());
+                $this->io->error("Failed to fetch work items for project {$project->key}: " . $e->getMessage());
                 return;
             }
             foreach ($responseData['issues'] as $issueData) {
                 $importKey = $issueData['id'];
-                $workItem = $this->workItemRepository->findOneBy(['importKey' => $importKey]) ?? new WorkItem();
                 $createdAt = new DateTime($issueData['fields']['created'], new DateTimeZone('Australia/Sydney'));
-                $workItem
-                    ->setImportKey($importKey)
-                    ->setCreatedAt($createdAt->setTimezone(static::getUtc()))
-                    ->setKey($issueData['key'])
-                    ->setSequence(explode('-', $issueData['key'])[1])
-                    ->setTitle($issueData['fields']['summary'])
-                    ->setPriority(match ($issueData['fields']['priority']['name'] ?? null) {
-                        'Critical' => WorkItemPriority::CRITICAL,
-                        'Major' => WorkItemPriority::HIGH,
-                        'Standard' => WorkItemPriority::STANDARD,
-                        'Minor / Low' => WorkItemPriority::LOW,
-                        default => null,
-                    })
-                    ->setStatus(match ($issueData['fields']['status']['statusCategory']['name'] ?? null) {
-                        'To Do' => WorkItemStatus::TODO,
-                        'In Progress' => WorkItemStatus::IN_PROGRESS,
-                        'Done' => WorkItemStatus::DONE,
-                        default => null,
-                    })
-                    ->setProject($this->entityManager->getReference(Project::class, $project->getId()))
-                    ->setOriginalEstimateInSeconds($issueData['fields']['timetracking']['originalEstimateSeconds'] ?? null)
-                    ->setRemainingEstimateInSeconds($issueData['fields']['timetracking']['remainingEstimateSeconds'] ?? null)
-                    ->setTimeSpentInSeconds($issueData['fields']['timetracking']['timeSpentSeconds'] ?? null)
-                ;
+
+                /** @var WorkItem $workItem */
+                $workItem = $this->workItemRepository->findOneBy(['importKey' => $importKey]) ?? new WorkItem();
+                $workItem->importKey = $importKey;
+                $workItem->createdAt = $createdAt->setTimezone(static::getUtc());
+                $workItem->key = $issueData['key'];
+                $workItem->sequence = explode('-', $issueData['key'])[1];
+                $workItem->title = $issueData['fields']['summary'];
+                $workItem->priority = match ($issueData['fields']['priority']['name'] ?? null) {
+                    'Critical' => WorkItemPriority::CRITICAL,
+                    'Major' => WorkItemPriority::HIGH,
+                    'Standard' => WorkItemPriority::STANDARD,
+                    'Minor / Low' => WorkItemPriority::LOW,
+                    default => null,
+                };
+                $workItem->status = match ($issueData['fields']['status']['statusCategory']['name'] ?? null) {
+                    'To Do' => WorkItemStatus::TODO,
+                    'In Progress' => WorkItemStatus::IN_PROGRESS,
+                    'Done' => WorkItemStatus::DONE,
+                    default => null,
+                };
+                $workItem->project = $this->entityManager->getReference(Project::class, $project->id);
+                $workItem->originalEstimateInSeconds = $issueData['fields']['timetracking']['originalEstimateSeconds'] ?? null;
+                $workItem->remainingEstimateInSeconds = $issueData['fields']['timetracking']['remainingEstimateSeconds'] ?? null;
+                $workItem->timeSpentInSeconds = $issueData['fields']['timetracking']['timeSpentSeconds'] ?? null;
+
                 if (isset($issueData['fields']['parent'])) {
                     $parentImportKey = $issueData['fields']['parent']['id'];
                     $parentWorkItem = $this->workItemRepository->findOneBy(['importKey' => $parentImportKey]);
-                    if ($parentWorkItem) {
-                        $workItem->setParentWorkItem($parentWorkItem);
-                    } else {
+                    $workItem->parentWorkItem = $parentWorkItem;
+                    if (!$parentWorkItem) {
                         $this->io->warning("Parent work item with key {$parentImportKey} not found for work item {$importKey}, skipping parent assignment.");
                     }
                 }
@@ -197,7 +198,7 @@ class ImportJiraDataCommand extends Command
         $this->io->text("- Importing work logs");
         $url = '4/worklogs';
         $query = [
-            'projectId' => $project->getImportKey(),
+            'projectId' => $project->importKey,
             'limit' => 1000,
         ];
         do {
@@ -219,15 +220,13 @@ class ImportJiraDataCommand extends Command
 
                 $importKey = $worklogData['tempoWorklogId'];
                 $workLog = $this->workLogRepository->findOneBy(['importKey' => $importKey]) ?? new WorkLog();
-                $workLog
-                    ->setImportKey($importKey)
-                    ->setWorkItem($workItem)
-                    ->setDescription($worklogData['description'])
-                    ->setDurationInSeconds($worklogData['timeSpentSeconds'])
-                    ->setBillableDurationInSeconds($worklogData['billableSeconds'])
-                    ->setBillable((bool) $worklogData['billableSeconds'])
-                ;
 
+                $workLog->importKey = $importKey;
+                $workLog->workItem = $workItem;
+                $workLog->description = $worklogData['description'];
+                $workLog->durationInSeconds = $worklogData['timeSpentSeconds'];
+                $workLog->billableDurationInSeconds = $worklogData['billableSeconds'];
+                $workLog->billable = (bool)$worklogData['billableSeconds'];
                 $this->entityManager->persist($workLog);
             }
             $url = $responseData['metadata']['next'] ?? null;
@@ -393,8 +392,8 @@ class ImportJiraDataCommand extends Command
 
         foreach ($organisations as $i => $organisationName) {
             $organisation = new \App\Entity\Organisation();
-            $organisation->setImportKey("local-$i");
-            $organisation->setName($organisationName);
+            $organisation->importKey = "local-$i";
+            $organisation->name = $organisationName;
             $this->entityManager->persist($organisation);
         }
 

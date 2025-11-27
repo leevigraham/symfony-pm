@@ -14,6 +14,7 @@ class AppExtension extends AbstractExtension
     {
         return [
             new TwigFilter('seconds_to_human', [AppExtensionRuntime::class, 'secondsToHuman'], ['is_safe' => ['html']]),
+            new TwigFilter('gravatar_url', [AppExtensionRuntime::class, 'gravatarUrl'], ['is_safe' => ['html']]),
         ];
     }
 }

@@ -1,0 +1,5 @@
+<a {{ attributes }}>
+    {{ startIcon|default ? component('Icon', {icon: startIcon}) }}
+    <span>{{ label }}</span>
+    {{ endIcon|default ? component('Icon', {icon: endIcon}) }}
+</a>

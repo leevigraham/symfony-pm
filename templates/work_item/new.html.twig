@@ -1,10 +1,2 @@
-{% embed '_embed/new.html.twig' with {
-    breadcrumbList: {
-        'Home': path('app_dashboard'),
-        'Work Items': path('app_work_item_index'),
-    }} %}
-    {% block content %}
-        {{ include('work_item/_form.html.twig') }}
-    {% endblock %}
-{% endembed %}
+{{ form(form) }}
 

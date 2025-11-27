@@ -4,35 +4,50 @@ namespace App\Controller;
 
 use App\Entity\WorkLog;
 use App\Form\WorkLogType;
-use App\Repository\WorkLogRepository;
+use App\View\Page;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\QueryBuilder;
-use Pagerfanta\Doctrine\ORM\QueryAdapter;
-use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/time-log')]
+#[Route('/work-log')]
 final class WorkLogController extends AbstractController
 {
-    #[Route(name: 'app_work_log_index', methods: ['GET'])]
-    public function index(
-        WorkLogRepository $repository,
-        #[MapQueryParameter] int $page = 1,
-        #[MapQueryParameter] int $perPage = 100,
-    ): Response
+    private function initBreadCrumbList(?WorkLog $workLog = null): array
     {
-        $queryBuilder = $repository->createQueryBuilder('entity');
-        $workLogs = new Pagerfanta(new QueryAdapter($queryBuilder))
-            ->setMaxPerPage(min($perPage, 100))
-            ->setCurrentPage($page);
+        $breadcrumbList = [[
+            'label' => 'Work Logs',
+            'url' => $this->generateUrl('app_work_log_index')
+        ]];
+        if ($workLog) {
+            $breadcrumbList[] = [
+                'label' => (string)$workLog,
+                'url' => $this->generateUrl('app_work_log_show', ['id' => $workLog->id])
+            ];
+        }
+        return $breadcrumbList;
+    }
 
-        return $this->render('work_log/index.html.twig', [
-            'pageTitle' => 'Work Logs',
-            'work_logs' => $workLogs,
+    #[Route(name: 'app_work_log_index', methods: ['GET'])]
+    public function index(): Response
+    {
+        $page = new Page('Work Logs');
+        $page->breadcrumbList = $this->initBreadCrumbList();
+        $page->actions[] = [
+            'name' => 'Link',
+            'props' => [
+                'label' => 'New Work Log',
+                'href' => $this->generateUrl('app_work_log_new'),
+                'class' => 'button button--primary',
+                'startIcon' => 'plus',
+            ]
+        ];
+
+        $page->content = $this->renderView('work_log/index.html.twig');
+
+        return $this->render('_embed/page.html.twig', [
+            'page' => $page,
         ]);
     }
 
@@ -47,26 +62,72 @@ final class WorkLogController extends AbstractController
             $entityManager->persist($workLog);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_work_log_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_work_log_show', ['id' => $workLog->id], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('work_log/new.html.twig', [
-            'pageTitle' => 'New Work Log',
+        $formView = $form->createView();
+
+        $page = new Page('New Work Log');
+        $page->breadcrumbList = [
+            ...$this->initBreadCrumbList(),
+            [
+                'label' => 'New',
+                'url' => $this->generateUrl('app_work_log_new')
+            ]
+        ];
+        $page->actions[] = [
+            'name' => 'Button',
+            'props' => [
+                'label' => 'Save',
+                'class' => 'button button--primary',
+                'type' => 'submit',
+                'form' => $formView->vars['id'],
+            ]
+        ];
+
+        $page->content = $this->renderView('work_log/new.html.twig', [
             'work_log' => $workLog,
+            'form' => $formView,
+        ]);
+
+        return $this->render('_embed/page.html.twig', [
+            'page' => $page,
             'form' => $form,
         ]);
     }
 
-    #[Route('/{id}', name: 'app_work_log_show', methods: ['GET'])]
-    public function show(WorkLog $workLog): Response
+    #[Route('/{id:workLog}', name: 'app_work_log_show', methods: ['GET'])]
+    public function show(WorkLog $workLog, Request $request): Response
     {
-        return $this->render('work_log/show.html.twig', [
-            'pageTitle' => 'Work Log Details',
+        $page = new Page($workLog->title ?? 'Work Log');
+        $page->breadcrumbList = $this->initBreadCrumbList($workLog);
+        $page->actions[] = [
+            'name' => 'Link',
+            'props' => [
+                'label' => 'Edit',
+                'href' => $this->generateUrl('app_work_log_edit', ['id' => $workLog->id]),
+                'class' => 'button',
+                'startIcon' => 'pen-to-square',
+            ]
+        ];
+        $page->actions[] = [
+            'name' => 'DeleteForm',
+            'props' => [
+                'entity' => $workLog,
+                'action' => $this->generateUrl('app_work_log_delete', ['id' => $workLog->id]),
+            ],
+        ];
+
+        $page->content = $this->renderView('work_log/show.html.twig', [
             'work_log' => $workLog,
+        ]);
+
+        return $this->render('_embed/page.html.twig', [
+            'page' => $page,
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_work_log_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id:workLog}/edit', name: 'app_work_log_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, WorkLog $workLog, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(WorkLogType::class, $workLog);
@@ -75,20 +136,45 @@ final class WorkLogController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_work_log_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_work_log_show', ['id' => $workLog->id], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('work_log/edit.html.twig', [
-            'pageTitle' => 'Edit Work Log',
+        $formView = $form->createView();
+
+        $page = new Page('Edit Work Log');
+        $page->breadcrumbList = [
+            ...$this->initBreadCrumbList($workLog),
+            [
+                'label' => 'Edit',
+                'url' => $this->generateUrl('app_work_log_edit', ['id' => $workLog->id])
+            ]
+        ];
+
+        $page->actions[] = [
+            'name' => 'Button',
+            'props' => [
+                'label' => 'Save',
+                'class' => 'button button--primary',
+                'type' => 'submit',
+                'form' => $formView->vars['id'],
+            ]
+        ];
+
+        $page->content = $this->renderView('work_log/edit.html.twig', [
             'work_log' => $workLog,
+            'form' => $formView,
+        ]);
+
+        return $this->render('_embed/page.html.twig', [
+            'page' => $page,
             'form' => $form,
         ]);
     }
 
-    #[Route('/{id}', name: 'app_work_log_delete', methods: ['POST'])]
+    #[Route('/{id:workLog}', name: 'app_work_log_delete', methods: ['POST'])]
     public function delete(Request $request, WorkLog $workLog, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$workLog->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $workLog->id, $request->getPayload()->getString('_token'))) {
             $entityManager->remove($workLog);
             $entityManager->flush();
         }

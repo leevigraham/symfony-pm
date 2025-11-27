@@ -1,8 +1,79 @@
-<a href="{{ url('app_project_show', {key: project.key}) }}"
-   class="chip"
-   title="{{ project.name }}"
-   target="_top"
+{%- set id = 'project-' ~ random() -%}
+{%- set chipId = "#{id}-chip" -%}
+{%- set previewId = "#{id}-preview" -%}
+{%- set contextMenuId = "#{id}-context-menu" -%}
+{%- set actionMenuId = "#{id}-action-menu" -%}
+{%- set invokerId = "#{previewId}-invoker" -%}
+<div class="Chip"
+     id="{{ chipId }}"
+     data-controller="context-menu-trigger"
+     data-action="contextmenu->context-menu-trigger#open"
+     data-context-menu-trigger-target-id-value="{{ contextMenuId }}"
 >
-    <span class="chip-label">{{ project.name }}</span>
-    <code>{{ project.key }}</code>
-</a>
+    <a href="{{ path('app_project_show', {key: project.key}) }}"
+       interestfor="{{ previewId }}"
+       id="{{ invokerId }}"
+    >
+        <span class="Chip-label">{{ project.name }}</span>
+        <code>{{ project.key }}</code>
+    </a>
+    <div class="StatusIndicator" data-status="{{ random(['danger', 'active']) }}">
+        <span class="sr-only">Active</span>
+    </div>
+    <button class="ActionMenuTrigger" popovertarget="{{ actionMenuId }}">
+        {{ source("_icons/ellipsis-vertical.svg") }}
+    </button>
+</div>
+
+{% set menu %}
+    <div class="Menu">
+        <ul>
+            <li>
+                <a href="{{ path('app_project_show', {key: project.key}) }}">
+                    {{ source("_icons/eye.svg") }}
+                    <span>View</span>
+                </a>
+            </li>
+            <li data-has-alt>
+                <a href="{{ path('app_project_edit', {key: project.key}) }}">
+                    {{ source("_icons/pen.svg") }}
+                    <span>Edit</span>
+                </a>
+                <a href="{{ path('app_project_show', {key: project.key,'X-Layer': 'sheet'}) }}"
+                   data-action="drawer-manager#openUrlInDrawer"
+                >
+                    {{ source("_icons/pen-to-square.svg") }}
+                    <span>Edit in side sheet</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+{% endset %}
+
+<div class="Popover"
+     id="{{ actionMenuId }}"
+     popover
+>
+    {{ menu }}
+</div>
+
+<div class="Popover Popover--preview"
+     id="{{ previewId }}"
+     popover="hint"
+>
+    {{ menu }}
+</div>
+
+<div class="Popover Popover--contextMenu"
+     id="{{ contextMenuId }}"
+     popover="manual"
+     data-controller="context-menu"
+     data-action="
+        pointerdown@window->context-menu#close
+        keydown.esc@window->context-menu#close
+    "
+>
+    {{ menu }}
+</div>
+
+

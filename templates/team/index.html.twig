@@ -1,9 +1,2 @@
-{% embed '_embed/index.html.twig' with {
-    singluarTitle: 'Team',
-    newPath: path('app_team_new'),
-} %}
-    {% block content %}
-        {{ component('DataTable:Team') }}
-    {% endblock %}
-{% endembed %}
+{{ component('DataTable:Team') }}
 

@@ -8,16 +8,18 @@
         <table>
             <thead>
             <tr>
-                {% set columnCount = 4 %}
+                {% set columnCount = 3 %}
+                <th scope="col">ID</th>
                 <th scope="col">Name</th>
-                <th scope="col" class="actions" title="Actions"></th>
+                <th scope="col" title="Actions"></th>
             </tr>
             </thead>
             <tbody>
             {% for team in pager %}
                 <tr>
-                    <th scope="row">{{ include('team/_chip.html.twig', {team: team}) }}</th>
-                    <td>
+                    <td class="id">{{ team.id }}</td>
+                    <th scope="row">{{ include('team/_chip.html.twig', {team}) }}</th>
+                    <td class="actions">
                         {{ include('_include/element_actions.html.twig', {
                             popoverId: "popover-#{team.id}",
                             viewUrl: path('app_team_show', {id: team.id}),

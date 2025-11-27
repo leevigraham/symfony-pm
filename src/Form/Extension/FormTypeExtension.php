@@ -27,7 +27,7 @@ class FormTypeExtension extends AbstractTypeExtension
     {
         $additionalClassMap = [
             'attr' => match(true) {
-                $form->isRoot() => 'form',
+                !$view->parent && $options['compound'] => 'form',
                 default => 'form-widget',
             },
             'row_attr' => match(true) {

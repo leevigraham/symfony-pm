@@ -2,12 +2,15 @@
 
 namespace App\DTO\DataTable;
 
-class DataTableFilterDTO
+use JetBrains\PhpStorm\ArrayShape;
+
+class DataTableFilterDTO implements DataTableFilterDTOInterface
 {
+    public ?string $id = null;
     public ?string $keywords = null;
 
-    public function __construct()
-    {
-
-    }
+    #[ArrayShape(['attribute' => 'string', 'direction' => 'string'])]
+    public ?array $orderBy = null;
+    #[ArrayShape(['page' => 'string', 'perPage' => 'string'])]
+    public ?array $pagination = null;
 }

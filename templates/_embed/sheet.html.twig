@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{{ pageTitle|default }}{% endblock %}</title>
+    <link rel="icon"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+
+    {% block stylesheets %}
+        {{ vite_entry_link_tags('app') }}
+    {% endblock %}
+
+    {% block javascripts %}
+        {{ vite_entry_script_tags('app') }}
+    {% endblock %}
+</head>
+<body data-controller="app" class="sheet">
+<turbo-frame id="{{ app.request.headers.get('Turbo-Frame', 'sheet') }}">
+    <header class="sheet-header"></header>
+    <main class="sheet-main">
+        <div class="page {{ page.classList|join(' ') }}">
+            {{ page.breadcrumbList ? include('include/breadcrumb_list.html.twig', {breadcrumbList: page.breadcrumbList}) }}
+            <div class="page-header">
+                <h1>{{ page.title }}</h1>
+                {% if page.actions %}
+                    <div class="page-header-actions">
+                        {% for component in page.actions %}
+                            {{ component(...component) }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            {% if page.menu %}
+                <nav title="Section Navigation">
+                    <ul class="Tabs">
+                        {% for menuItem in page.menu %}
+                            <li>
+                                <a href="{{ menuItem.url }}" class="{% if menuItem.active %}active{% endif %}">
+                                    {{ menuItem.label }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            {% endif %}
+            <div class="page-body">
+                {% include page.template with page.templateVars %}
+            </div>
+        </div>
+    </main>
+    <footer class="sheet-footer"></footer>
+</turbo-frame>
+</body>

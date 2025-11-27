@@ -1,0 +1,15 @@
+<div class="Popover">
+    <header class="Popover-header">
+        <h1>{{ page.title }}</h1>
+        {% if page.actions %}
+            <div class="Popover-header-actions">
+                {% for component in page.actions %}
+                    {{ component(...component) }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </header>
+    <div class="Popover-body">
+        {% include page.template with page.templateVars %}
+    </div>
+</div>

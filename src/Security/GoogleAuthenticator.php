@@ -110,14 +110,14 @@ class GoogleAuthenticator extends AbstractAuthenticator
                 // No user… create one and set some values
                 if (!$user) {
                     $user = new User();
-                    $user->setEmail($googleUser->getEmail());
-                    $user->setEmailVerified($googleUser->toArray()['email_verified'] ?? false);
-                    $user->setPassword('');
-                    $user->setDisplayName(trim("{$googleUser->getFirstName()} {$googleUser->getLastName()}"));
+                    $user->email = $googleUser->getEmail();
+                    $user->emailVerified = $googleUser->toArray()['email_verified'] ?? false;
+                    $user->password = '';
+                    $user->displayName = trim("{$googleUser->getFirstName()} {$googleUser->getLastName()}");
                 }
 
                 // Add the googleId
-                $user->setGoogleAccountId($googleUser->getId());
+                $user->googleAccountId = $googleUser->getId();
                 $this->entityManager->persist($user);
                 $this->entityManager->flush();
 

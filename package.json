@@ -1,0 +1,38 @@
+{
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "@eslint/css": "^0.10.0",
+        "@eslint/js": "^9.32.0",
+        "@hotwired/turbo": "^8.0.20",
+        "@symfony/stimulus-bridge": "^3.2.0 || ^4.0.0",
+        "@symfony/ux-live-component": "file:vendor/symfony/ux-live-component/assets",
+        "@symfony/ux-turbo": "file:vendor/symfony/ux-turbo/assets",
+        "eslint": "^9.32.0",
+        "eslint-config-prettier": "^10.1.8",
+        "globals": "^16.3.0",
+        "postcss": "^8.5.6",
+        "prettier": "3.6.2",
+        "stylelint": "^16.22.0",
+        "stylelint-config-clean-order": "^7.0.0",
+        "stylelint-config-idiomatic-order": "^10.0.0",
+        "stylelint-config-standard": "^38.0.0",
+        "stylelint-order": "^7.0.0",
+        "typescript-eslint": "^8.38.0",
+        "vite": "^7.0",
+        "vite-plugin-inspect": "^11.3.0",
+        "vite-plugin-symfony": "^8.2"
+    },
+    "dependencies": {
+        "@hotwired/stimulus": "^3.2.2",
+        "@iframe-resizer/child": "^5.5.2",
+        "@iframe-resizer/parent": "^5.5.2",
+        "@tailwindcss/vite": "^4.1.11",
+        "highlight.js": "^11.11.1",
+        "tailwindcss": "^4.1.11"
+    }
+}

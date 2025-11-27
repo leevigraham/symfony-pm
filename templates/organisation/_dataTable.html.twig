@@ -6,26 +6,24 @@
         <table>
             <thead>
             <tr>
-                {% set columnCount = 3 %}
+                {% set columnCount = 4 %}
+                <th scope="col">ID</th>
                 <th scope="col">Name</th>
                 <th scope="col">Description</th>
-                <th scope="col" class="actions" title="Actions"></th>
+                <th scope="col" title="Actions"></th>
             </tr>
             </thead>
             <tbody>
-            {% for entity in pager %}
+            {% for organisation in pager %}
                 <tr>
-                    <th scope="row">
-                        <a href="{{ path('app_organisation_show', {id: entity.id}) }}">
-                            {{ entity.name }}
-                        </a>
-                    </th>
-                    <td>{{ entity.description }}</td>
-                    <td>
+                    <td class="id">{{ organisation.id }}</td>
+                    <th scope="row">{{ include('organisation/_chip.html.twig', {organisation}) }}</th>
+                    <td>{{ organisation.description }}</td>
+                    <td class="actions">
                         {{ include('_include/element_actions.html.twig', {
-                            popoverId: "popover-#{entity.id}",
-                            viewUrl: path('app_organisation_show', {'id': entity.id}),
-                            editUrl: path('app_organisation_edit', {'id': entity.id}),
+                            popoverId: "popover-#{organisation.id}",
+                            viewUrl: path('app_organisation_show', {'id': organisation.id}),
+                            editUrl: path('app_organisation_edit', {'id': organisation.id}),
                         }) }}
                     </td>
                 </tr>

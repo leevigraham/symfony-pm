@@ -1,0 +1,26 @@
+<div class="Panel">
+    <div class="Panel-body">
+        <dl>
+            <div>
+                <dt>ID</dt>
+                <dd>{{ project.id }}</dd>
+            </div>
+            <div>
+                <dt>Name</dt>
+                <dd>{{ project.name }}</dd>
+            </div>
+            <div>
+                <dt>Key</dt>
+                <dd>{{ project.key }}</dd>
+            </div>
+            <div>
+                <dt>Import Key</dt>
+                <dd class="code">{{ project.importKey }}</dd>
+            </div>
+            <div>
+                <dt>Organisation</dt>
+                <dd>{{ project.organisation ? include('organisation/_chip.html.twig', {organisation: project.organisation}) }}</dd>
+            </div>
+        </dl>
+    </div>
+</div>

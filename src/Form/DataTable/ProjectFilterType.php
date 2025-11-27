@@ -19,16 +19,11 @@ class ProjectFilterType extends AbstractType
             'required' => false,
             'priority' => 10,
         ]);
-
-        $builder->add('orderBy', OrderByType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
-        $resolver->setDefaults([
-            'data_class' => ProjectFilterDTO::class,
-        ]);
     }
 
     public function getParent(): string

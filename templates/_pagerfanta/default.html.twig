@@ -1,8 +1,7 @@
 {%- block pager_widget -%}
-    <nav class="pagination">
-
+    <nav class="Pagination">
         {% if pagerfanta.getNbPages() > 1 %}
-        <div class="pagination-buttons">
+        <div class="Pagination-buttons">
 
             {%- if pagerfanta.hasPreviousPage() -%}
                 {%- set path = route_generator.route(pagerfanta.getPreviousPage()) -%}
@@ -11,7 +10,6 @@
                    href="{{- path -}}"
                    rel="prev"
                    title="Previous Page"
-                   data-controller="scroll-to"
                    data-action="live#update:prevent data-table#scrollToTop:prevent"
                    data-model="page"
                    data-value="{{ page }}"
@@ -31,7 +29,6 @@
                    href="{{- path -}}"
                    rel="next"
                    title="Next Page"
-                   data-controller="scroll-to"
                    data-action="live#update:prevent data-table#scrollToTop:prevent"
                    data-model="page"
                    data-value="{{ page }}"
@@ -47,7 +44,7 @@
         </div>
         {% endif %}
 
-        <span class="pagination-results">
+        <span class="Pagination-results">
             {% if pagerfanta.getNbPages() > 1 %}
             {{ pagerfanta.currentPageOffsetStart }} &dash; {{ pagerfanta.currentPageOffsetEnd }} of
             {% endif %}

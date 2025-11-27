@@ -18,13 +18,19 @@ class DataTableFilterType extends AbstractType
             'label' => 'Keywords',
             'required' => false
         ]);
+        $builder->add('orderBy', OrderByType::class, [
+            'priority' => -100
+        ]);
+        $builder->add('pagination', PaginationType::class, [
+            'priority' => -100
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => DataTableFilterDTO::class,
-            'csrf_protection' => false
+            'csrf_protection' => false,
+            'method' => 'GET',
         ]);
     }
 }

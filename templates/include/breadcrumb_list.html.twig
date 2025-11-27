@@ -1,5 +1,5 @@
-<ol class="breadcrumb-list">
-    {% for label, url in breadcrumbList %}
-        <li><a href="{{ url }}">{{ label }}</a></li>
+<ol class="BreadcrumbList">
+    {% for key, breadcrumb in breadcrumbList|slice(0, -1) %}
+        <li><a href="{{ breadcrumb.url|default(breadcrumb) }}">{{ breadcrumb.label|default(key) }}</a></li>
     {% endfor %}
 </ol>

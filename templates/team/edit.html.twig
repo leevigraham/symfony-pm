@@ -1,8 +1,1 @@
-{% embed '_embed/edit.html.twig' with {
-    deleteForm: include('team/_delete_form.html.twig'),
-    breadcrumbList: {
-        'Home': path('app_dashboard'),
-        'Teams': path('app_team_index'),
-    }
-} %}
-{% endembed %}
+{{ form(form) }}
